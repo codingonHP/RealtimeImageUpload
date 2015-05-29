@@ -49,6 +49,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -168,11 +170,45 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PictureUploadController.cs" />
+    <Compile Include="Database\AspNetRole.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AspNetUser.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AspNetUserClaim.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AspNetUserLogin.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\C__MigrationHistory.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\PhotoApp.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhotoApp.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\PhotoApp.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\PhotoApp.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhotoApp.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Database\PhotoStore.cs">
+      <DependentUpon>PhotoApp.tt</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -180,12 +216,29 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Database\PhotoApp.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PhotoApp.edmx</DependentUpon>
+      <LastGenOutput>PhotoApp.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Database\PhotoApp.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PhotoApp.edmx</DependentUpon>
+      <LastGenOutput>PhotoApp.cs</LastGenOutput>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <EntityDeploy Include="Database\PhotoApp.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>PhotoApp.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Database\PhotoApp.edmx.diagram">
+      <DependentUpon>PhotoApp.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -235,10 +288,10 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\PictureUpload\Dashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\PictureUpload\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -246,6 +299,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
