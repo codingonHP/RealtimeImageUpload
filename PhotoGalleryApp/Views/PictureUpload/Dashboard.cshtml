@@ -42,6 +42,19 @@
 
 
 
+			// Create a function that the hub can call to broadcast messages.
+			photoAppSignalR.client.someoneIsSharing = function (res) {
+				$("<div>", {
+
+					"class": "loveContainer"
+
+				}).html(res).draggable().appendTo("body").fadeIn().delay(2000).fadeOut();
+
+			};
+
+
+
+
 			var upload = function () {
 
 				if (_file.files.length === 0) {
@@ -91,14 +104,16 @@
 					_progress.style.width = Math.ceil(e.loaded / e.total) * 100 + '%';
 				}, false);
 
-
+				//posting the file
 				request.open('POST', "@Url.Action("SaveImage", "PictureUpload")");
 				request.send(data);
 
 
 			}
 
-			_submit.addEventListener('click', upload);
+			//_submit.addEventListener('click', upload);
+
+			_file.addEventListener('change', upload);
 
 			var displayImage = function (base64Data, unqId) {
 
@@ -129,30 +144,36 @@
 
 					// Call the Send method on the hub server with timeout.
 					setInterval(updatePeersPosition(model), timeout);
-				
+
 				});
 
-			
+
 			});
 
 			var redrawPosition = function (model) {
 				var updateRate = 1;
 				$("#" + model.id).animate({
 					left: model.left,
-					top : model.top
+					top: model.top
 
-				}, updateRate,"linear");
-				
+				}, updateRate, "linear");
+
 			};
 
 
-			function updatePeersPosition(model)
-			{
+			function updatePeersPosition(model) {
 				if (moved) {
 					moved = false;
 					photoAppSignalR.server.updatePosition(model);
 				}
 			}
+
+
+			$("input[type='file']").on('click', function (e) {
+
+				// Call the Send method on the hub server.
+				photoAppSignalR.server.someoneIsSharing();
+			});
 
 		});
 
@@ -188,18 +209,57 @@
 		height: 200px;
 		width: 200px;
 	}
+
+	.loveContainer {
+		position: relative;
+		padding: 10px;
+		background-color: crimson;
+		width: 30%;
+		border: 2px dotted black;
+		border-radius: 5px;
+		color: white;
+		display: none;
+		position: absolute !important;
+		display: block;
+		bottom: 0 !important;
+		right: 0 !important;
+	}
+
+
+	.fileUpload {
+		position: relative;
+		overflow: hidden;
+		margin: 10px;
+	}
+
+		.fileUpload input.upload {
+			position: absolute;
+			top: 0;
+			right: 0;
+			margin: 0;
+			padding: 0;
+			font-size: 20px;
+			cursor: pointer;
+			opacity: 0;
+			filter: alpha(opacity=0);
+		}
 </style>
 
 
 <h2>Dashboard</h2>
 
 <div class='container'>
-	<p>
-		Select File: <input type='file' id='_file'> <input type='button' id='_submit' value='Upload!' name="file">
-	</p>
+	
 	<div class='progress_outer'>
 		<div id='_progress' class='progress'></div>
 	</div>
+
+	<div class="fileUpload btn btn-primary">
+		<span>Upload</span>
+		<input type='file' id='_file' class="upload">
+	</div>
+
+
 
 	<div id="playground">
 
