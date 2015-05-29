@@ -4,76 +4,133 @@
 
 @section scripts{
 	<script>
-		
-		var _submit = document.getElementById('_submit'),
-        _file = document.getElementById('_file'),
-        _progress = document.getElementById('_progress');
 
-		var upload = function () {
 
-			if (_file.files.length === 0) {
-				return;
-			}
+		$(function () {
 
-			var data = new FormData();
-			data.append('selectedFile', _file.files[0]);
+			
+			var _submit = document.getElementById('_submit'),
+			_file = document.getElementById('_file'),
+			_progress = document.getElementById('_progress');
 
-			var request = new XMLHttpRequest();
-			request.onreadystatechange = function () {
-				if (request.readyState == 4) {
-					try {
-						
-						var resp = JSON.parse(request.response);
-						if (resp != undefined) {
-							_progress.style.width = "100%";
-						
-							$("<div>", {
-								id: resp.Id,
-								"class": "photoRespContainer"
+			// Declare a proxy to reference the hub.
+			var photoApp = $.connection.photoAppHub;
+			var connPromise = $.connection.hub.start();
 
-							}).html(displayImage(resp.Base64, resp.Id)).draggable().appendTo("#playground");
-						}
-					} catch (e) {
-						var resp = {
-							status: 'error',
-							data: 'Unknown error occurred: [' + request.responseText + ']'
-						};
-					}
+			// Create a function that the hub can call to broadcast messages.
+			photoApp.client.broadcastMessage = function (imageFile, respId) {
 
-				}
+				$("<div>", {
+					id: respId,
+					"class": "photoRespContainer"
+
+				}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground");
+
+
 			};
 
-			request.upload.addEventListener('progress', function (e) {
-				_progress.style.width = Math.ceil(e.loaded / e.total) * 100 + '%';
-			}, false);
 
-			
+
+			var upload = function () {
+
+				if (_file.files.length === 0) {
+					return;
+				}
+
+				var data = new FormData();
+				data.append('selectedFile', _file.files[0]);
+
+				var request = new XMLHttpRequest();
+				request.onreadystatechange = function () {
+					if (request.readyState == 4) {
+						try {
+
+							var resp = JSON.parse(request.response);
+							if (resp != undefined) {
+								_progress.style.width = "100%";
+
+								$("<div>", {
+									id: resp.Id,
+									"class": "photoRespContainer"
+
+								}).html(displayImage(resp.Base64, resp.Id)).draggable().appendTo("#playground");
+
+							
+								// Start the connection.
+								connPromise.done(function () {
+
+									// Call the Send method on the hub.
+									photoApp.server.send(resp.Base64, resp.Id);
+
+								});
+
+
+
+							}
+						} catch (e) {
+							var resp = {
+								status: 'error',
+								data: 'Unknown error occurred: [' + request.responseText + ']'
+							};
+						}
+
+					}
+				};
+
+				request.upload.addEventListener('progress', function (e) {
+					_progress.style.width = Math.ceil(e.loaded / e.total) * 100 + '%';
+				}, false);
+
+
 				request.open('POST', "@Url.Action("SaveImage", "PictureUpload")");
 				request.send(data);
-			
-		
-		}
-
-		_submit.addEventListener('click', upload);
-
-		var displayImage = function (base64Data, unqId) {
-
-			var image = $("<img>", {
-				src: "data:image/jpg;base64," + base64Data
-
-			});
-
-			return $("<div>", {
-				id: unqId,
-				"class": "imageHolder"
-
-			}).html(image);
-		};
 
 		
+			}
 
+			_submit.addEventListener('click', upload);
+
+			var displayImage = function (base64Data, unqId) {
+
+				var image = $("<img>", {
+					src: "data:image/jpg;base64," + base64Data
+
+				});
+
+				return $("<div>", {
+					id: unqId,
+					"class": "imageHolder"
+
+				}).html(image);
+			};
+
+
+			////signalR code below
+			//$(function () {
+
+			//	// Declare a proxy to reference the hub.
+			//	var photoApp = $.connection.photAppHub;
+
+			//	// Create a function that the hub can call to broadcast messages.
+			//	photoApp.client.broadcastMessage = function (imageFile, respId) {
+
+			//		$("<div>", {
+			//			id: respId,
+			//			"class": "photoRespContainer"
+
+			//		}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground");
+
+
+			//	};
+
+
+			//});
+
+
+		});
 
 	</script>
+
 }
 
 <style>
