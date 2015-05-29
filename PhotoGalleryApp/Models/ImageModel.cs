@@ -9,5 +9,7 @@ namespace PhotoGalleryApp.Models
 	{
 		public int Id { get; set; }
 		public string FileName { get; set; }
+
+		public string Base64 { get; set; }
 	}
 }

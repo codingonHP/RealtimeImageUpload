@@ -4,7 +4,7 @@
 
 @section scripts{
 	<script>
-
+		
 		var _submit = document.getElementById('_submit'),
         _file = document.getElementById('_file'),
         _progress = document.getElementById('_progress');
@@ -22,9 +22,16 @@
 			request.onreadystatechange = function () {
 				if (request.readyState == 4) {
 					try {
+						
 						var resp = JSON.parse(request.response);
-						if (resp === "success") {
+						if (resp != undefined) {
 							_progress.style.width = "100%";
+						
+							$("<div>", {
+								id: resp.Id,
+								"class": "photoRespContainer"
+
+							}).html(displayImage(resp.Base64, resp.Id)).draggable().appendTo("#playground");
 						}
 					} catch (e) {
 						var resp = {
@@ -40,11 +47,31 @@
 				_progress.style.width = Math.ceil(e.loaded / e.total) * 100 + '%';
 			}, false);
 
-			request.open('POST', "@Url.Action("SaveImage", "PictureUpload")");
-			request.send(data);
+			
+				request.open('POST', "@Url.Action("SaveImage", "PictureUpload")");
+				request.send(data);
+			
+		
 		}
 
 		_submit.addEventListener('click', upload);
+
+		var displayImage = function (base64Data, unqId) {
+
+			var image = $("<img>", {
+				src: "data:image/jpg;base64," + base64Data
+
+			});
+
+			return $("<div>", {
+				id: unqId,
+				"class": "imageHolder"
+
+			}).html(image);
+		};
+
+		
+
 
 	</script>
 }
@@ -58,6 +85,20 @@
 		background: #3BC10F;
 		height: 2px;
 	}
+
+	div.photoRespContainer {
+		background-color: rgb(243, 243, 243);
+		-moz-border-radius: 2px;
+		-webkit-border-radius: 2px;
+		border-radius: 2px;
+		border: 1px solid #ebebeb;
+		width: 200px;
+		height: 200px;
+		overflow: hidden;
+		word-wrap: break-word;
+		margin: 10px;
+		float: left;
+	}
 </style>
 
 
@@ -69,5 +110,9 @@
 	</p>
 	<div class='progress_outer'>
 		<div id='_progress' class='progress'></div>
+	</div>
+
+	<div id="playground">
+
 	</div>
 </div>
