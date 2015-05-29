@@ -8,17 +8,20 @@
 
 		$(function () {
 
-			
+			var messageFrequency = 10;
+			var timeout = 1000 / messageFrequency;
+			var moved = true;
+
 			var _submit = document.getElementById('_submit'),
 			_file = document.getElementById('_file'),
 			_progress = document.getElementById('_progress');
 
 			// Declare a proxy to reference the hub.
-			var photoApp = $.connection.photoAppHub;
+			var photoAppSignalR = $.connection.photoAppHub;
 			var connPromise = $.connection.hub.start();
 
 			// Create a function that the hub can call to broadcast messages.
-			photoApp.client.broadcastMessage = function (imageFile, respId) {
+			photoAppSignalR.client.broadcastMessage = function (imageFile, respId) {
 
 				$("<div>", {
 					id: respId,
@@ -27,6 +30,14 @@
 				}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground");
 
 
+			};
+
+
+
+			// Create a function that the hub can call to broadcast messages.
+			photoAppSignalR.client.updateLocation = function (model) {
+
+				redrawPosition(model);
 			};
 
 
@@ -55,12 +66,11 @@
 
 								}).html(displayImage(resp.Base64, resp.Id)).draggable().appendTo("#playground");
 
-							
 								// Start the connection.
 								connPromise.done(function () {
 
-									// Call the Send method on the hub.
-									photoApp.server.send(resp.Base64, resp.Id);
+									// Call the Send method on the hub server.
+									photoAppSignalR.server.send(resp.Base64, resp.Id);
 
 								});
 
@@ -85,7 +95,7 @@
 				request.open('POST', "@Url.Action("SaveImage", "PictureUpload")");
 				request.send(data);
 
-		
+
 			}
 
 			_submit.addEventListener('click', upload);
@@ -104,28 +114,45 @@
 				}).html(image);
 			};
 
+			$("body").on("drag", ".photoRespContainer", function () {
+				moved = true;
+				var _this = $(this);
+				// Start the connection.
+				connPromise.done(function () {
 
-			////signalR code below
-			//$(function () {
+					var model = {
+						id: _this.attr("id"),
+						left: _this.css('left'),
+						top: _this.css('top')
 
-			//	// Declare a proxy to reference the hub.
-			//	var photoApp = $.connection.photAppHub;
+					};
 
-			//	// Create a function that the hub can call to broadcast messages.
-			//	photoApp.client.broadcastMessage = function (imageFile, respId) {
+					// Call the Send method on the hub server with timeout.
+					setInterval(updatePeersPosition(model), timeout);
+				
+				});
 
-			//		$("<div>", {
-			//			id: respId,
-			//			"class": "photoRespContainer"
+			
+			});
 
-			//		}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground");
+			var redrawPosition = function (model) {
+				var updateRate = 1;
+				$("#" + model.id).animate({
+					left: model.left,
+					top : model.top
+
+				}, updateRate,"linear");
+				
+			};
 
 
-			//	};
-
-
-			//});
-
+			function updatePeersPosition(model)
+			{
+				if (moved) {
+					moved = false;
+					photoAppSignalR.server.updatePosition(model);
+				}
+			}
 
 		});
 
@@ -155,6 +182,11 @@
 		word-wrap: break-word;
 		margin: 10px;
 		float: left;
+	}
+
+	img {
+		height: 200px;
+		width: 200px;
 	}
 </style>
 
