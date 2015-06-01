@@ -27,7 +27,7 @@
 					id: respId,
 					"class": "photoRespContainer"
 
-				}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground");
+				}).html(displayImage(imageFile, respId)).draggable().appendTo("#playground").fadeIn();
 
 
 			};
@@ -203,6 +203,7 @@
 		word-wrap: break-word;
 		margin: 10px;
 		float: left;
+		display : none;
 	}
 
 	img {
